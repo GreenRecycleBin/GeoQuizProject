@@ -67,6 +67,19 @@ public class QuizActivity extends ActionBarActivity {
         mQuestionTextView.setText(question);
     }
 
+    private void checkAnswer(boolean userPressedTrue) {
+        boolean isAnswerTrue = mQuestionBank[mCurrentIndex].isTrueQuestion();
+        int messageResId = 0;
+
+        if (userPressedTrue == isAnswerTrue) {
+            messageResId = R.string.correct_toast;
+        } else {
+            messageResId = R.string.incorrect_toast;
+        }
+
+        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
