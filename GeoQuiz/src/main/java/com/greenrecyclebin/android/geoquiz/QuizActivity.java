@@ -13,11 +13,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 
 public class QuizActivity extends ActionBarActivity {
 
     private static final String KEY_INDEX = "index";
-    private static final String KEY_CHEATER = "mIsCheater";
+    private static final String KEY_CHEATER = "mDidCheat";
 
     private Button mTrueButton;
     private Button mFalseButton;
@@ -32,7 +34,7 @@ public class QuizActivity extends ActionBarActivity {
             new TrueFalse(R.string.question_asia, true)
     };
     private int mCurrentIndex;
-    private boolean mIsCheater;
+    private ArrayList<Integer> mDidCheat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +43,9 @@ public class QuizActivity extends ActionBarActivity {
 
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
-            mIsCheater = savedInstanceState.getBoolean(KEY_CHEATER);
+            mDidCheat = savedInstanceState.getIntegerArrayList(KEY_CHEATER);
+        } else {
+            mDidCheat = new ArrayList<>();
         }
 
         updateQuestion();
@@ -68,6 +72,7 @@ public class QuizActivity extends ActionBarActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(QuizActivity.this, CheatActivity.class);
                 intent.putExtra(CheatActivity.EXTRA_ANSWER_IS_TRUE, mQuestionBank[mCurrentIndex].isTrueQuestion());
+                intent.putExtra(CheatActivity.EXTRA_ANSWER_SHOWN, mDidCheat.contains(mCurrentIndex));
                 startActivityForResult(intent, 0);
             }
         });
@@ -77,7 +82,6 @@ public class QuizActivity extends ActionBarActivity {
             @Override
             public void onClick(View view) {
                 mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
-                mIsCheater = false;
                 updateQuestion();
             }
         });
@@ -93,7 +97,7 @@ public class QuizActivity extends ActionBarActivity {
         boolean isAnswerTrue = mQuestionBank[mCurrentIndex].isTrueQuestion();
         int messageResId = 0;
 
-        if (mIsCheater) {
+        if (mDidCheat.contains(mCurrentIndex)) {
             messageResId = R.string.judgement_toast;
         } else {
             if (userPressedTrue == isAnswerTrue) {
@@ -111,14 +115,15 @@ public class QuizActivity extends ActionBarActivity {
         super.onSaveInstanceState(outState);
 
         outState.putInt(KEY_INDEX, mCurrentIndex);
-        outState.putBoolean(KEY_CHEATER, mIsCheater);
+        outState.putIntegerArrayList(KEY_CHEATER, mDidCheat);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (data == null) return;
 
-        mIsCheater = data.getBooleanExtra(CheatActivity.EXTRA_ANSWER_SHOWN, false);
+        if (data.getBooleanExtra(CheatActivity.EXTRA_ANSWER_SHOWN, false))
+            mDidCheat.add(mCurrentIndex);
     }
 
     @Override

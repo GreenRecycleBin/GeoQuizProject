@@ -31,7 +31,7 @@ public class CheatActivity extends ActionBarActivity {
 
         mAnswerIsTrue = getIntent().getBooleanExtra(EXTRA_ANSWER_IS_TRUE, false);
 
-        if (savedInstanceState != null && savedInstanceState.getBoolean(KEY_ANSWER_SHOWN))
+        if (getIntent().getBooleanExtra(EXTRA_ANSWER_SHOWN, false) || savedInstanceState != null && savedInstanceState.getBoolean(KEY_ANSWER_SHOWN))
             setAnswerText();
         else
             setAnswerShownResult(false);
